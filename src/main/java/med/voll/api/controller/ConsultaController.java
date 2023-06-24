@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import med.voll.api.domain.consulta.AgendaDeConsultas;
 import med.voll.api.domain.consulta.DadosAgendamentoConsulta;
+import med.voll.api.domain.consulta.DadosDetalhamentoConsulta;
 
 @RestController
 @RequestMapping("consulta")
@@ -23,7 +24,7 @@ public class ConsultaController {
 	public ResponseEntity agendar(@RequestBody @Valid DadosAgendamentoConsulta dados) {
 		
 		agenda.agendar(dados);
-		return ResponseEntity.ok(new  DadosAgendamentoConsulta(null,null,null,null));
+		return ResponseEntity.ok(new DadosDetalhamentoConsulta(null, null, null, null, null));
 		
 		
 		
