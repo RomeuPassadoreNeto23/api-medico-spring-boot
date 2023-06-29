@@ -11,7 +11,7 @@ import med.voll.api.domain.medico.Medico;
 import med.voll.api.domain.paciente.Paciente;
 
 @Table(name = "consulta")
-@Entity(name = "consulta")
+@Entity(name = "Consulta")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
