@@ -1,5 +1,6 @@
 package med.voll.api.domain.consulta.validacoes;
 
+import med.voll.api.domain.ValidacaoException;
 import med.voll.api.domain.consulta.DadosAgendamentoConsulta;
 
 import java.time.DayOfWeek;
@@ -16,6 +17,9 @@ public class ValidadorHorarioFuncionamentoClinica {
         Boolean antesDaAberturaDaClinica = dataConsulta.getHour() < 7;
         //verifica se a data e depois da 18 horas
         Boolean  depoisDoEncerramentoDaClinica = dataConsulta.getHour() > 18;
+        if(domingo || antesDaAberturaDaClinica || depoisDoEncerramentoDaClinica ) {
+        	throw new  ValidacaoException("Consulta fora do Horário de funcionamento da clinica");
+        }
 
 
     }
