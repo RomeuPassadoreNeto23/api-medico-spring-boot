@@ -6,7 +6,9 @@ import med.voll.api.domain.consulta.DadosAgendamentoConsulta;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
-public class ValidadorHorarioFuncionamentoClinica {
+import org.springframework.stereotype.Component;
+@Component
+public class ValidadorHorarioFuncionamentoClinica implements ValidadorAgendamentoDeConsulta {
 
     public void  validar(DadosAgendamentoConsulta dados){
         //pega a data da consulta
