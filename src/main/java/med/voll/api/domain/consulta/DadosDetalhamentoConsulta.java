@@ -2,8 +2,8 @@ package med.voll.api.domain.consulta;
 
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import med.voll.api.domain.medico.Especialidade;
 
 public record DadosDetalhamentoConsulta(
@@ -15,9 +15,16 @@ public record DadosDetalhamentoConsulta(
 		Long idPaciente,
 
 		LocalDateTime data,
-
+        
+		 @JsonIgnore
 		Especialidade especialidade
 
 ) {
+
+	public DadosDetalhamentoConsulta(Consulta consulta) {
+		this(consulta.getId(), consulta.getMedico().getId(),consulta.getPaciente().getId(),consulta.getData(), null);
+	}
+
+	
 
 }
