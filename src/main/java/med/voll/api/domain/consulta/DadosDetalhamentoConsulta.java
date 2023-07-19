@@ -16,7 +16,7 @@ public record DadosDetalhamentoConsulta(
 
 		LocalDateTime data,
         
-		 @JsonIgnore
+		@JsonIgnore
 		Especialidade especialidade
 
 ) {

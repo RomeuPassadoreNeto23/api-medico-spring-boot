@@ -5,12 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import med.voll.api.domain.ValidacaoException;
 import med.voll.api.domain.consulta.validacoes.ValidadorAgendamentoDeConsulta;
+import med.voll.api.domain.consulta.validacoes.cancelamento.ValidadorCancelamentoDeConsulta;
 import med.voll.api.domain.medico.Medico;
 import med.voll.api.domain.medico.MedicoRepository;
 import med.voll.api.domain.paciente.Paciente;
 import med.voll.api.domain.paciente.PacienteRepository;
+import med.voll.api.infra.exception.ValidacaoException;
 
 @Service
 public class AgendaDeConsultas {
@@ -26,6 +27,8 @@ public class AgendaDeConsultas {
 	
 	@Autowired
 	private List<ValidadorAgendamentoDeConsulta> validadores;
+	@Autowired
+	private List<ValidadorCancelamentoDeConsulta > validadoresCancelamento;
 
 	public DadosDetalhamentoConsulta agendar(DadosAgendamentoConsulta dados) {
 
@@ -42,8 +45,10 @@ public class AgendaDeConsultas {
 		Paciente paciente = pacienteRepository.getReferenceById(dados.idPaciente());
 
 		Medico medico = escolherMedico(dados);
-
-		Consulta consulta = new Consulta(null, medico, paciente, dados.data(), null);
+        if(medico == null) {
+        	throw new ValidacaoException("Não existe Médico disponivel !");
+        }
+		Consulta consulta = new Consulta(null, medico, paciente, dados.data(),null);
 		consultaRepository.save(consulta);
 		return new DadosDetalhamentoConsulta(consulta);
 	}
@@ -62,6 +67,9 @@ public class AgendaDeConsultas {
 		if (!consultaRepository.existsById(dados.idConsulta())) {
 			throw new ValidacaoException("Id da consulta informado não existe!");
 		}
+		
+		validadoresCancelamento.forEach(v -> v.validar(dados));
+		
 
 		var consulta = consultaRepository.getReferenceById(dados.idConsulta());
 		consulta.cancelar(dados.motivo());
