@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import med.voll.api.domain.medico.Especialidade;
 
 public record DadosAgendamentoConsulta(
-		Long idMedico,
+    	 Long idMedico,
 
 		@NotNull Long idPaciente,
 
