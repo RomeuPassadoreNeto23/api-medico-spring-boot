@@ -19,13 +19,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
-@DataJpaTest
+
 class MedicoControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -35,11 +36,9 @@ class MedicoControllerTest {
     @Autowired
     private JacksonTester<DadosDetalhamentoMedico>dadosDetalhamentoMedicoJson;
     @MockBean
-    private DadosCadastroMedico dadosCadastroMedico;
-    @Autowired
-    private MedicoRepository medicoRepository;
-    @Autowired
-    private TestEntityManager em;
+    private MedicoRepository repository;
+
+
 
 
     @Test
@@ -54,44 +53,53 @@ class MedicoControllerTest {
     @WithMockUser
     void cadastrar_cenario2()  throws Exception {
 
-        var especialidade = Especialidade.CARDIOLOGIA;
-        var endereco = new DadosEndereco("teste","barana","23123467","parada","br","apt T5","400");
+        var dadosCadastro = new DadosCadastroMedico(
+                "Medico",
+                "medico@voll.med",
+                "61999999999",
+                "123456",
+                Especialidade.CARDIOLOGIA,
+                dadosEndereco());
 
-       var medico = cadastrarMedico();
+        when(repository.save(any())).thenReturn( new  Medico(dadosCadastro));
+
 
         var response = mvc.perform(post("/medicos")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(dadosCadastroMedicoJson.write(
-                        new DadosCadastroMedico("carlos beti","carlos_beti@gmail.com","115594737","123255",especialidade,endereco)
-                ).getJson())
+                .content(dadosCadastroMedicoJson.write(dadosCadastro).getJson())
         ).andReturn().getResponse();
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        var dadosDetalhamento = new DadosDetalhamentoMedico(
+                null,
+                dadosCadastro.nome(),
+                dadosCadastro.email(),
+                dadosCadastro.crm(),
+                dadosCadastro.telefone(),
+                dadosCadastro.especialidade(),
+                new Endereco(dadosCadastro.endereco())
+        );
+
         var jsonEsperado = dadosDetalhamentoMedicoJson.write(
-                new DadosDetalhamentoMedico(null,"carlos beti","carlos_beti@gmail.com","123255","115594737",especialidade,endereco2)
+              dadosDetalhamento
         ).getJson();
 
-
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonEsperado);
 
 
     }
-    private Medico cadastrarMedico(String nome, String email, String crm, Especialidade especialidade) {
-        var medico = new Medico(dadosMedico(nome, email, crm, especialidade));
-        em.persist(medico);
-        return medico;
-    }
-    private DadosCadastroMedico dadosMedico(String nome, String email,String telefone, String crm, Especialidade especialidade) {
-        return new DadosCadastroMedico(
-                nome,
-                email,
-                telefone,
-                crm,
-                especialidade,
-                dadosEndereco()
-        );
-
-    }
     private DadosEndereco dadosEndereco() {
-        return new DadosEndereco();
+        return new DadosEndereco(
+                "rua xpto",
+                "bairro",
+                "00000000",
+                "Brasilia",
+                "DF",
+                null,
+                null
+        );
     }
+
+
+
 }
